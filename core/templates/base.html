@@ -1,0 +1,80 @@
+{% load class_active %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Big Time Data Science</title>
+    
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="{{ STATIC_URL }}vendors/bootstrap/3.3.0/css/bootstrap.min.css">
+    
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+	<script src="{{ STATIC_URL }}vendors/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="{{ STATIC_URL }}vendors/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
+    <link rel="stylesheet" href="{{ STATIC_URL }}vendors/bootstrap/3.3.0/css/bootstrap-theme.min.css">
+    <style type="text/css">
+      .nobr	{ white-space:nowrap; }
+    </style>
+    <link rel="stylesheet" href="{{ STATIC_URL}}css/modal-color.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}vendors/bootstrap-datepicker/datepicker.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css">
+    {% block css %}{% endblock %}
+  </head>
+  <body>
+    {% if user.is_authenticated %}
+    <nav class="navbar navbar-default" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+            <!-- <span class="icon-bar"></span> -->
+            <!-- <span class="icon-bar"></span> -->
+            <!-- <span class="icon-bar"></span> -->
+          </button>
+          <a href="{% url 'dashboard' %}" class="navbar-brand">Big Time Data Science</a>
+        </div>
+	<div id="navbar" class="navbar-collapse collapse">
+	  <ul class="nav navbar-nav">
+        <li {% class_active 'projects' %}><a href="{% url 'projects' %}">Projects</a></li>
+            <li {% class_active 'settings' %}><a href="{% url 'settings' %}">User</a></li>
+            <li {% class_active 'report' %}><a href="{% url 'report' %}">Report</a></li>
+	  </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+	  </ul>
+	</div>
+      </div>
+    </nav>
+    {% endif %}
+
+    <div class="container">
+
+    {% if messages %}
+    <div class="row">
+      {% for message in messages %}
+      <div  class="alert {% if message.tags %}alert-{{ message.tags }}"{% endif %}>{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    
+    {% block content %}{% endblock %}
+    </div>
+    {% block js_conf %}{% endblock %}
+    <script src="{{ STATIC_URL }}vendors/jsurl/url.min.js"></script>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="{{ STATIC_URL }}vendors/jquery/1.11.1/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="{{ STATIC_URL }}vendors/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}vendors/fb/react-0.12.2.js"></script>
+    <script src="{{ STATIC_URL }}js/modal-alert.js"></script>
+    {% block js %}{% endblock %}
+    {% include "modals/alert.html" %}
+  </body>
+</html>

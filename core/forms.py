@@ -1,0 +1,143 @@
+from django import forms
+from django.forms.formsets import formset_factory
+from django.utils.safestring import mark_safe
+
+from models import Project, TrackedTime, Timezone, Indicator, IndicatorToTrackedtime
+
+
+class TimezoneForm(forms.ModelForm):
+    class Meta:
+        model = Timezone
+        fields = ('timezone',)
+
+
+class PasswordForm(forms.Form):
+    old_password = forms.CharField(widget=forms.PasswordInput)
+    new_password = forms.CharField(widget=forms.PasswordInput)
+    confirm = forms.CharField(widget=forms.PasswordInput)
+
+    def clean(self):
+        cleaned_data = super(self.__class__, self).clean()
+        p = cleaned_data.get('new_password')
+        c = cleaned_data.get('confirm')
+        if (p and c and p != c):
+            self.add_error('confirm', 'Does not match')
+
+
+class RegisterForm(forms.Form):
+    username = forms.CharField()
+    email = forms.EmailField()
+    password = forms.CharField(widget=forms.PasswordInput)
+    confirm = forms.CharField(widget=forms.PasswordInput)
+
+    def clean(self):
+        cleaned_data = super(self.__class__, self).clean()
+        p = cleaned_data.get('password')
+        c = cleaned_data.get('confirm')
+        if (p and c and p != c):
+            self.add_error('confirm', 'Does not match')
+
+
+class LoginForm(forms.Form):
+    username = forms.CharField()
+    password = forms.CharField(widget=forms.PasswordInput)
+
+
+class TrackTimeForm(forms.ModelForm):
+    class Meta:
+        model = TrackedTime
+        exclude = ('user', 'project', 'created_at', 'manual_date', 'deleted_project_id')
+
+    hours = forms.FloatField(widget=forms.NumberInput(
+        attrs={'min': 0}))
+    track_date = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'class': 'datepicker'}))
+
+    def __init__(self, *args, **kwargs):
+        super(TrackTimeForm, self).__init__(*args, **kwargs)
+
+
+class ProjectForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = ('name', 'description', 'color')
+
+
+class SliderWidget(forms.NumberInput):
+    def render(self, name, value, attrs=None):
+        super(SliderWidget, self).render(name, value, attrs)
+        tag_attrs = {k: v for k, v in attrs.items()}
+        if name:
+            tag_attrs['name'] = name
+        if value:
+            tag_attrs['value'] = value
+        shadowed = ['type']
+        attr_insertion = u' '.join([u'%s="%s"' % (k, v) for k, v in
+                                    tag_attrs.items() if k not in shadowed])
+        tag_line = u'''<input type="range" min="0"
+        max="100" step="1" %s />''' % attr_insertion
+        return mark_safe(tag_line)
+
+
+class TagitWidget(forms.TextInput):
+    def render(self, name, value, attrs=None):
+        super(TagitWidget, self).render(name, value, attrs)
+        tag_attrs = {k: v for k, v in attrs.items()}
+        if name:
+            tag_attrs['name'] = name
+        if value:
+            tag_attrs['value'] = value
+        if 'style' in tag_attrs:
+            tag_attrs['style'] += '; display: none !important'
+        else:
+            tag_attrs['style'] = 'display: none'
+        shadowed = ['type']
+        attr_insertion = u' '.join([u'%s="%s"' % (k, v) for k, v in
+                                    tag_attrs.items() if k not in shadowed])
+        tag_line = u'''<input style="display: none;" %s />
+        <ul id="tagitTags"></ul>''' % attr_insertion
+        return mark_safe(tag_line)
+
+
+class QuickTrackForm(forms.ModelForm):
+    class Meta:
+        model = TrackedTime
+        exclude = ('user', 'created_at', 'manual_date',
+                   'track_date', 'deleted_project_id', 'satisfaction', 'indicators', 'project',
+                   'hours')
+
+    # hours = forms.FloatField(widget=forms.NumberInput(attrs={'min': 0}))
+    # project = forms.ModelChoiceField(queryset=Project.objects.none(), widget=forms.HiddenInput)
+    # tags = forms.CharField(widget=TagitWidget)
+    # satisfaction = forms.IntegerField(widget=SatisfactionSlider)
+    description = forms.CharField(widget=forms.Textarea(attrs={'rows':2}))
+
+    def __init__(self, projects, request, *args, **kwargs):
+        try:
+            pid = int(request.GET.get('pid'))
+        except (TypeError, ValueError):
+            pid = None
+        if pid:
+            kwargs['initial'] = {
+                'project': pid
+            }
+
+        super(QuickTrackForm, self).__init__(*args, **kwargs)
+        # self.fields['project'].queryset = projects
+
+class IndicatorToTrackedtimeForm(forms.ModelForm):
+    indicator = forms.ModelChoiceField(queryset=Indicator.objects.all(), widget=forms.HiddenInput)
+    value = forms.IntegerField(widget=SliderWidget)
+
+    class Meta:
+        model = IndicatorToTrackedtime
+        exclude = ('tracked_time',)
+
+    def save(self, tracked_time):
+        obj = super(IndicatorToTrackedtimeForm, self).save(commit=False)
+        obj.tracked_time = tracked_time
+        obj.save()
+        return obj
+
+IndicatorToTrackedtimeFormSet = formset_factory(IndicatorToTrackedtimeForm, extra=0)

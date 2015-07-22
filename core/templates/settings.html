@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% load bootstrap_tags %}
+
+{% block content %}
+<div class="row">
+  <div class="col-xs-6">
+    <form method="POST" action=".">
+      <legend>Change Password</legend>
+      {% csrf_token %}
+      {{ password_form|as_bootstrap }}
+      <div class="form-actions">
+	<button type="submit" class="btn btn-primary"
+		name="action" value="password">Submit</button>
+      </div>
+    </form>
+  </div>
+  <div class="col-xs-6">
+    <form method="POST" action=".">
+      <legend>Select Timezone</legend>
+      {% csrf_token %}
+      {{ tz_form|as_bootstrap }}
+      <div class="form-actions">
+	<button type="submit" class="btn btn-primary"
+		name="action" value="tz">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

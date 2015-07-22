@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% load bootstrap_tags %}
+
+{% block content %}
+<div class="row">
+    <form method="GET" id="filter-form">
+    <div class="col-xs-4">
+        <label class="control-label" for="inputStart">Start</label>
+        <input type="text" class="form-control datepicker" name="start" value="{{ start }}">
+    </div>
+    <div class="col-xs-4">
+        <label class="control-label" for="inputStart">End</label>
+        <input type="text" class="form-control datepicker" name="end" value="{{ end }}">
+    </div>
+    <div class="col-xs-4" style="margin-top: 25px;">
+        <button type="submit" class="btn btn-default">Go</button>
+        <a href="{{ csv_link }}">CSV</a>
+        <a href="#" style="float: right"><img src="{{ STATIC_URL }}img/pie.png"></a>
+        <a href="#" style="float: right"><img src="{{ STATIC_URL }}img/bar.png"></a>
+    </div>
+    </form>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <table class="table table-condensed">
+            <thead>
+                <tr>
+                    <th>Project</th>
+                    <th>Hrs</th>
+                    <th>Notes</th>
+                    <th>Day</th>
+                    <th>Entered&nbsp;On</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for x in tracked_time %}
+                <tr class="editable-inplace" data-props='{{x|safe}}'>
+                    {% comment %}
+                    data-pk="{{ x.id }}"
+                    data-project-name="{{ x.project.name }}"
+                    data-hours="{{ x.hours }}"
+                    data-description="{{ x.description }}"
+                    data-track_date="{{ x.track_date }}"
+                    data-created_at="{{ x.created_at }}"
+                    data-delete-url="{% url 'delete-tracked-time' x.id %}"
+                    >
+                    <td class="editable-inplace" data-url="">{{ x.project.name }}</td>
+                    <td>{{ x.hours }}</td>
+                    <td>{{ x.description }}</td>
+                    <td>{{ x.track_date }}</td>
+                    <td>{{ x.created_at }}</td>
+                    <td><form method="POST" action="{% url 'delete-tracked-time' x.id %}">
+                            <input type="hidden" name="id" value="{{ x.id }}"/>
+                            <input type="hidden" name="next" value="{{ next }}"/>
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-default" aria-label="remove">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                    </button></form></td>
+                    {% endcomment %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block css %}
+  <link rel="stylesheet" href="{{ STATIC_URL }}vendors/bootstrap-datepicker/datepicker.css">
+{% endblock %}
+
+    {% block js %}
+    <script type="text/javascript" src="{{ STATIC_URL }}vendors/bootstrap-datepicker/bootstrap-datepicker.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/reports.js"></script>
+    {% endblock %}
+

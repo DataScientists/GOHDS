@@ -1,0 +1,30 @@
+{% extends "mobile_base.html" %}
+{# this template is unused #}
+
+{% block content %}
+      <div class="row">
+        <div class="col-xs-12 text-center"><h1>GOHDS</h1></div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 text-center"><h2>Domains</h2></div>
+      </div>
+      <hr />
+
+      <div class="row">
+        <div class="col-xs-offset-2 col-xs-8">
+          {% for i in '12345' %}
+            <ul>
+              <li>Domain {{ i }}
+                <ul>
+                  <li>List of Indicators</li>
+                  {% for j in '1234567' %}
+                  <li>indicator {{ j }}</li>
+                  {% endfor %}
+                </ul>
+              </li>
+            </ul>
+          {% endfor %}
+        </div>
+      </div>
+
+{% endblock content %}

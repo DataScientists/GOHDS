@@ -1,0 +1,90 @@
+{% extends 'mobile_base.html' %}
+{% load bootstrap_tags static %}
+
+{% block js %}
+<script type="text/javascript" src="{% static "js/quick_track.js" %}"></script>
+<link rel="stylesheet" href="{{ STATIC_URL }}css/quick_track.css">
+{% endblock js %}
+
+{% block content %}
+<!-- Modal -->
+    <div class="modal fade" id="add_indicator_modal" role="dialog">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-body">
+                <input class="j_indicator_filter form-control">
+                <hr>
+                <ul>
+                {% for domain in domains %}
+                    <li data-id="{{ domain.pk }}" class="j_domain">
+                        <span class="j_domain_name">{{ domain.name}}</span>
+                        <ul>
+                            {% for indicator in domain.indicator_set.all %}
+                            <li><a href="#add-indicator" data-id="{{ indicator.pk }}" class="j_btn_indicator_add j_indicator">{{ indicator.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+
+        </div>
+    </div>
+<!-- /Modal -->
+
+    <div class="row">
+        <div class="col-xs-12 text-center"><h1>GOHDS</h1></div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 text-center"><h2>GNH Indicator</h2></div>
+    </div>
+    <hr />
+    <form method="POST" action="{{ get_full_path }}" class="form-horizontal" role="form" id="quick-track-form">
+        {% csrf_token %}
+        {% if formset.non_form_errors %}
+            <div class="row">
+                <div class="col-xs-12">
+                    {{ formset.non_form_errors }}
+                </div>
+            </div>
+        {% endif %}
+        <div class="j_empty_form">
+            <div class="row j_indicator_row">
+                <div class="col-xs-3">{{ formset.empty_form.indicator }}<span class="j_indicator_title"></span></div>
+                <div class="col-xs-7">{{ formset.empty_form.value }}</div>
+                <div class="col-xs-2"><span class="j_indicator_value"></span></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-10">
+                {{ formset.management_form }}
+                <div class="j_form_container">
+                    {% for formset_form in formset %}
+                    <div class="row indicator_row j_indicator_row">
+                        <div class="col-xs-3">{{ formset_form.indicator }}<span class="j_indicator_title"></span></div>
+                        <div class="col-xs-7">{{ formset_form.value }}</div>
+                        <div class="col-xs-2"><span class="j_indicator_value"></span></div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-xs-2">
+                <a href="#add-indicator" class="btn btn-xs btn-info" data-toggle="modal" data-target="#add_indicator_modal">add</a>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-xs-12">
+                {{ form|as_bootstrap_horizontal }}
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "mobile_base.html" %}
+{% load static %}
+
+
+{% block content %}
+      <div class="row">
+        <div class="col-xs-12 text-center"><h1>GOHDS</h1></div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 text-center"><a href="{% url 'quick_track' %}" class="btn btn-primary">Inform</a></div>
+      </div>
+      <div class="row">
+        <div id="container" class="col-xs-12" style="height: 400px;"></div>
+      </div>
+      <div class="row">
+        <div class="col-xs-offset-2 col-xs-8 text-center">
+          <select class="form-control">
+            <option>Today</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+          </select>
+        </div>
+      </div>
+{% endblock content %}
+
+
+{% block js %}
+    <script type="text/javascript">
+$(function () {
+    $('#container').highcharts({
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: null
+        },
+        xAxis: {
+            labels: {
+                enabled: false
+            }
+        },
+        yAxis: {
+            min: 0,
+            max: 100,
+            title: {
+                text: null
+            }
+        },
+        legend: {
+            layout: 'horizontal',
+            align: 'center',
+            verticalAlign: 'bottom',
+            borderWidth: 1,
+            shadow: true
+        },
+        series: [
+        {% for indicator in indicators %}{% if indicator.avg_value != None %}
+            {
+                name: '{{ indicator.name }}',
+                data: [
+                    ['Details:', {{ indicator.avg_value }}]
+                ],
+                color: '#{{ indicator.color }}'
+            },
+        {% endif %}{% endfor %}
+        ]
+    });
+});
+    </script>
+    <script src="{% static "js/highcharts.js" %}"></script>
+{% endblock js %}

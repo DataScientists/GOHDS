@@ -1,0 +1,9 @@
+.j_empty_form {
+    display: none;
+}
+.added {
+    color: black;
+}
+.indicator_row {
+    padding-bottom: 6px;
+}
